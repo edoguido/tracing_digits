@@ -1,0 +1,28 @@
+html, body {
+    padding: 0;
+    margin: 0;
+    overflow: hidden;
+}
+
+canvas#defaultCanvas0.p5canvas {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: 1;
+}
+
+canvas#defaultCanvas1 {
+    background-color: rgb(135, 135, 135);
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    z-index: -1;
+}
+
+div#cursor {
+    height: 1px;
+    background-color: blue;
+    width: 100%;
+    position: fixed;
+    z-index: 20;
+}
