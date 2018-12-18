@@ -1,23 +1,32 @@
-var width = window.innerWidth / 3;
-var height = window.innerHeight / 1.1;
-
-var cursor = document.getElementById('cursor');
-cursor.style.top = height + 'px';
+var width;
+var height;
+var cursor;
 
 var scrollSpeed,
     mappedSpeed;
 
 // var color;
-var speed = 4;
+var speed = 1;
 var scrollHistory = [];
+var scrolled = 0;
+var scrolledcm;
+var conversionUnit = 0.0026458333;
+
+// variable to store canvas for later write on image file
 var cnv;
+var toSave = false;
+var saved = false;
 
 function setup() {
     cnv = createCanvas(window.innerWidth / 3, window.innerHeight / 1.1);
+
+    height = cnv.height;
+    width = cnv.width;
+
+    cursor = document.getElementById('cursor');
+    cursor.style.top = height + 'px';
 }
 
-var toSave = false;
-var saved = false;
 
 function draw() {
 
@@ -36,35 +45,60 @@ function draw() {
     // fill(color);
     for (var i = 0; i < scrollHistory.length; i++) {
         var x = scrollHistory[i];
+        var y = i * speed;
         stroke(0);
         strokeWeight(12);
-        line(-x, i * speed, x, i * speed);
+        line(-x, y, x, y);
     }
 
     noLoop();
 }
 
 function mouseWheel(e) {
+
     updateScroll(e);
+
     if (toSave == true && saved == false) {
-        print(toSave);
         toSave = false;
         saved = true;
+
         // save(cnv, 'it-werks.png');
-        saveToServer();
+        // saveToServer();
+
     } else return;
 }
 
-function touchMoved(e) {
-    updateScroll(e);
-}
+// function touchMoved(e) {
+//     updateScroll(e);
+// }
+
+// function mouseClicked() {
+//     save(cnv, 'it-werks.png');
+// }
 
 function updateScroll(e) {
+
     scrollSpeed = abs(e.delta);
     mappedSpeed = constrain(scrollSpeed, 1, width);
     scrollHistory.push(mappedSpeed);
 
     // color = map(mappedSpeed, 1, window.innerWidth / 4, 135, 0);
+
+    scrolled += 1;
+    scrolledcm = scrolled * conversionUnit;
+    print(scrolledcm);
+
+    // switch (true) {
+    //     case scrolledcm < 1:
+    //         document.getElementById('scroll-counter').innerHTML = `You have scrolled ${(scrolledcm).toFixed(0)} millimeters.`;
+    //         break;
+    //     case scrolledcm >= 1:
+    //         document.getElementById('scroll-counter').innerHTML = `You have scrolled ${scrolledcm.toFixed(2)} centimeters.`
+    //         break;
+    // }
+
+    document.getElementById('scroll-counter').innerHTML = `You have scrolled ${(scrolledcm * 10).toFixed(0)} centimeters.`
+
     loop();
 }
 
@@ -73,6 +107,6 @@ function windowResized() {
 }
 
 function saveToServer() {
-    var mycanvas = document.getElementById("defaultCanvas0");   //get your canvas
-    var image    = mycanvas.toDataURL("image/png");             //Convert the canvas to image, currently converting to .png
+    var mycanvas = document.getElementById("defaultCanvas0"); //get your canvas
+    var image = mycanvas.toDataURL("image/png"); //Convert the canvas to image, currently converting to .png
 }

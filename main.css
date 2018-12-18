@@ -1,8 +1,13 @@
+:root {
+    --padding: 12px;
+}
+
 html,
 body {
     padding: 0;
     margin: 0;
     overflow: hidden;
+    background-color: rgb(120, 120, 120);
 }
 
 canvas {
@@ -13,21 +18,39 @@ canvas {
 canvas#defaultCanvas0.p5canvas {
     width: 100%;
     height: 100%;
+    display: block;
     position: absolute;
     z-index: 1;
 }
 
-#backgroundCanvas {
-    background-color: rgb(120, 120, 120);
+#scroll-data,
+#scroll-counter {
+    color: black;
+    font-family: 'IBM Plex Mono';
+    font-size: 12pt;
+}
+
+#scroll-data {
     width: 100%;
-    height: 100%;
+
+    display: flex;
+    justify-content: center;
+    align-items: stretch;
+
     position: absolute;
-    z-index: -1;
+    bottom: 0;
+}
+
+#scroll-counter {
+    text-align: center;
+    display: inline-block;
+    /* bottom: var(--padding);; */
+    /* transform: translateX(-50%); */
 }
 
 div#cursor {
+    /* background-color: rgb(64, 64, 64); */
     height: 1px;
-    background-color: blue;
     width: 100%;
     position: fixed;
     z-index: 20;
