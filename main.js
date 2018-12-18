@@ -1,49 +1,63 @@
-
 var width = window.innerWidth;
 var height = window.innerHeight / 1.1;
 
 var cursor = document.getElementById('cursor');
 cursor.style.top = height + 'px';
 
-var scrollSpeed = 0,
-    scrollMax = 0,
-    pos = 0,
+var scrollSpeed,
     mappedSpeed;
 
-var color;
-var stepHeight = 4;     // rectangles height
-var steps = 0;
+// var color;
+var speed = 4;
+
+var scrollHistory = [];
 
 function setup() {
     createCanvas(window.innerWidth, window.innerHeight / 1.1);
-    translate(0, pos);
-    background(120);
-    fill(0);
-    noStroke();
 }
 
 function draw() {
-    // translate(0, pos);
+    
+    // this is before everything so that we can draw with a transparent background
+    if (scrollHistory.length > height / speed) {
+        clear();
+        scrollHistory.splice(0, 1);
+    }
+
+    translate(width / 2, 0);
+
+    noFill();
+    // fill(color);
+    for (var i = 0; i < scrollHistory.length; i++) {
+        var x = scrollHistory[i];
+        // beginShape();
+        stroke(0);
+        strokeWeight(12);
+        line(-x, i * speed, x, i * speed);
+        // endShape();
+    }
+
+
     noLoop();
 }
 
-function mouseWheel(event) {
-    scrollSpeed = abs(event.delta);
-    pos += stepHeight / 2;
-    
-    mappedSpeed = constrain(scrollSpeed, 1, window.innerWidth / 3);
-    // fill(map(mappedSpeed, 1, window.innerWidth / 4, 135, 0));
-    // print(mappedSpeed);
-    
-    for (var i = 0; i < steps; i++) {
-        rect(width / 2 - (mappedSpeed / 2), i, mappedSpeed, stepHeight);
-    }
+function mouseWheel(e) {
+    updateScroll(e);
+}
 
-    steps += 1 ;
-    print(steps);
+function touchMoved(e) {
+    updateScroll(e);
+}
+
+function updateScroll(e) {
+    scrollSpeed = abs(e.delta);
+    mappedSpeed = constrain(scrollSpeed, 1, window.innerWidth / 3);
+    scrollHistory.push(mappedSpeed);
+
+    // color = map(mappedSpeed, 1, window.innerWidth / 4, 135, 0);
     loop();
 }
 
 function windowResized() {
-    resizeCanvas(window.innerWidth, window.innerHeight/1.1);
+    resizeCanvas(window.innerWidth, window.innerHeight / 1.1);
 }
