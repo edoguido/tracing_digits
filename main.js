@@ -72,9 +72,9 @@ function mouseWheel(e) {
 //     updateScroll(e);
 // }
 
-// function mouseClicked() {
-//     save(cnv, 'it-werks.png');
-// }
+function mouseClicked() {
+    save(cnv, 'traccia.png');
+}
 
 function updateScroll(e) {
 
