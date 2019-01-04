@@ -1,9 +1,6 @@
 var width;
 var height;
 
-var scrollSpeed,
-    mappedSpeed;
-
 // var color;
 var speed = 2;
 var scrollHistory = [];
@@ -18,7 +15,11 @@ var strweight = 16;
 var cnv, gph;
 
 function setup() {
-    cnv = createCanvas(window.innerWidth / 3, window.innerHeight / 1.1);
+    if (window.innerWidth > window.innerHeight) {
+        cnv = createCanvas(window.innerWidth / 3, window.innerHeight / 1.1);
+    } else {
+        cnv = createCanvas(window.innerWidth, window.innerHeight / 1.1);
+    }
 
     height = cnv.height;
     width = cnv.width;
@@ -42,18 +43,19 @@ function draw() {
     beginShape();
     noFill();
     for (var i = 0; i < scrollHistory.length; i++) {
-        color = map(scrollHistory[i], 1, window.innerWidth / 4, 80, 0);
-        strokeColor = map(scrollHistory[i], 0, cnv.width - (strweight * 10), 2, strweight);
+        color = map(scrollHistory[i], 1, cnv.width, 80, 0);
+        weight = map(scrollHistory[i], 0, cnv.width - (strweight * 10), 2, strweight);
 
         var x = scrollHistory[i];
         var y = i * speed;
 
         stroke(color);
-        strokeWeight(strokeColor);
+        strokeWeight(weight);
         line(-x, y, x, y);
 
+        // writing data to image buffer for later export on white background
         gph.stroke(color);
-        gph.strokeWeight(strokeColor);
+        gph.strokeWeight(weight);
         // manual translation because translate function seems to be 
         // in conflict with original canvas translation 
         gph.line(-x + (gph.width / 2), y, x + (gph.width / 2), y);
@@ -63,10 +65,25 @@ function draw() {
     noLoop();
 }
 
-function updateScroll(e) {
+function windowResized() {
+    resizeCanvas(window.innerWidth, window.innerHeight / 1.1);
+}
+
+
+
+// *        -----------------------         * //
+//          MOUSE RUNTIME FUNCTIONS           //
+// *        -----------------------         * //
+
+function mouseWheel(e) {
+    updateMouseScroll(e);
+}
+
+function updateMouseScroll(e) {
+    var scrollSpeed, mappedSpeed;
 
     scrollSpeed = abs(e.delta);
-    mappedSpeed = constrain(scrollSpeed, 0, cnv.width - (strweight * 10));
+    mappedSpeed = constrain(scrollSpeed, 0, cnv.width - (strweight * 13));
     scrollHistory.push(mappedSpeed);
 
     scrolled += 1;
@@ -77,42 +94,86 @@ function updateScroll(e) {
     loop();
 }
 
-function mouseWheel(e) {
-    updateScroll(e);
-}
-
-// TODO - Touch support
-// function touchMoved(e) {
-//     updateScroll(e);
-// }
-
 function mouseClicked() {
     var elToSave = gph.canvas;
     var canvasData = elToSave.toDataURL('image/png');
     var headerData = 'data:image/png;base64,';
-    canvasData = canvasData.replace(headerData, '')
+    canvasData = canvasData.replace(headerData, '');
 
-    saveToServer(canvasData, 'server_side/save_image.php');
+    // saveToServer(canvasData, 'server_side/scroll_printer.py');
 }
 
-function windowResized() {
-    resizeCanvas(window.innerWidth, window.innerHeight / 1.1);
+
+
+// *        -----------------------         * //
+//          TOUCH RUNTIME FUNCTIONS           //
+// *        -----------------------         * //
+
+// TODO - Touch support
+var start = {
+    x: 0,
+    y: 0
+};
+
+var startTime, endTime;
+
+document.addEventListener('touchstart', function (e) {
+    // start.x = e.touches[0].clientX;
+    start.y = e.touches[0].clientY;
+    startTime = new Date().getTime();
+    // print(startTime);
+}, false);
+
+document.addEventListener('touchend', function (e) {
+    endTime = new Date().getTime();
+    // print(endTime);
+}, false);
+
+document.addEventListener('touchmove', function (e) {
+    offset = {};
+    // offset.x = start.x - e.touches[0].clientX;
+    endTime = new Date().getTime();
+    offset.y = start.y - e.touches[0].clientY;
+
+    updateTouchScroll(e, offset.y, endTime);
+}, false);
+
+function updateTouchScroll(e, offset, endTime) {
+    var scrollSpeed = abs(offset - start.y) / (endTime - startTime);
+    print(scrollSpeed);
+
+    var mappedSpeed = constrain(scrollSpeed * 10, 0, cnv.width - (strweight * 13));
+    scrollHistory.push(mappedSpeed);
+
+    scrolled += 1;
+    scrolledcm = scrolled * CONVERSION_VALUE;
+
+    document.getElementById('scroll-counter').innerHTML = `You have scrolled ${(scrolledcm * 10).toFixed(0)} centimeters.`
+
+    loop();
 }
 
+
+// *        ---------------------         * //
+//          BACKEND COMMUNICATION           //
+// *        ---------------------         * //
+
+// first parameter is the data to send,
+// second parameter is the script to execute.
 function saveToServer(source, targetOp) {
     var http = new XMLHttpRequest();
     http.open('POST', targetOp, true);
 
     // http.setRequestHeader('Content-type', 'image/png');
 
-    http.onreadystatechange = function () { //Call a function when the state changes.
+    http.onreadystatechange = function () {
         if (http.readyState == 4 && http.status == 200) {
             print(http.response);
         }
     }
 
     var today = new Date();
-    var date = today.getFullYear()+'-'+(today.getMonth()+1)+'-'+today.getDate();
+    var date = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
     var time = today.getHours() + "-" + today.getMinutes() + "-" + today.getSeconds();
 
     var obj = {
@@ -124,6 +185,8 @@ function saveToServer(source, targetOp) {
 
     http.send(json);
 }
+
+
 
 function floydSteinberg(sb, w, h) // source buffer, width, height
 {

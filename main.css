@@ -55,3 +55,7 @@ div#cursor {
     position: fixed;
     z-index: 20;
 }
+
+/* @media screen and (max-width: 720px) {
+
+} */
