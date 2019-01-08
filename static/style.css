@@ -17,7 +17,7 @@ canvas {
 
 canvas#defaultCanvas0.p5canvas {
     width: 100%;
-    height: 100%;
+    height: auto;
     display: block;
     position: absolute;
     z-index: 1;
@@ -34,6 +34,7 @@ canvas#defaultCanvas0.p5canvas {
     width: 100%;
 
     display: flex;
+    flex-direction: column;
     justify-content: center;
     align-items: stretch;
 
@@ -43,9 +44,33 @@ canvas#defaultCanvas0.p5canvas {
 
 #scroll-counter {
     text-align: center;
-    display: inline-block;
-    /* bottom: var(--padding);; */
-    /* transform: translateX(-50%); */
+    display: block;
+    margin: var(--padding);
+}
+
+div#print-btn {
+    display: inline;
+    margin: var(--padding) auto calc(var(--padding) * 2) auto;
+    padding: var(--padding) calc(var(--padding) * 2);
+    
+    background-color: transparent;
+    border: 1px solid rgba(0, 0, 0, 1);
+    
+    font-size: 10pt;
+    font-family: 'IBM Plex Mono';
+    color: black;
+    
+    cursor: pointer;
+}
+#scroll-data > div:hover {
+    background-color: rgba(0, 0, 0, 0.1);
+    border: 1px solid rgba(0, 0, 0, 1);
+    color: rgba(0, 0, 0, 1);
+}
+#scroll-data > div:active {
+    background-color: rgba(0, 0, 0, 0.2);
+    border: 1px solid rgba(0, 0, 0, 1);
+    color: rgba(0, 0, 0, 1);
 }
 
 div#cursor {
@@ -55,7 +80,3 @@ div#cursor {
     position: fixed;
     z-index: 20;
 }
-
-/* @media screen and (max-width: 720px) {
-
-} */

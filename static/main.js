@@ -6,7 +6,7 @@ var speed = 2;
 var scrollHistory = [];
 var scrolled = 0;
 var scrolledcm;
-var CONVERSION_VALUE = 0.0026458333;
+const CONVERSION_VALUE = 0.0026458333;
 var color;
 var stroke;
 var strweight = 16;
@@ -14,11 +14,13 @@ var strweight = 16;
 // variable to store canvas for later write on image file
 var cnv, gph;
 
+var controlsHeight = document.getElementById('scroll-data').offsetHeight;
+
 function setup() {
     if (window.innerWidth > window.innerHeight) {
-        cnv = createCanvas(window.innerWidth / 3, window.innerHeight / 1.1);
+        cnv = createCanvas(window.innerWidth / 3, window.innerHeight - controlsHeight);
     } else {
-        cnv = createCanvas(window.innerWidth, window.innerHeight / 1.1);
+        cnv = createCanvas(window.innerWidth, window.innerHeight - controlsHeight);
     }
 
     height = cnv.height;
@@ -29,7 +31,6 @@ function setup() {
 }
 
 function draw() {
-
     // this is before everything so that we can draw with a transparent background
     clear();
     gph.background(255);
@@ -66,8 +67,11 @@ function draw() {
 }
 
 function windowResized() {
-    resizeCanvas(window.innerWidth, window.innerHeight / 1.1);
+    resizeCanvas(window.innerWidth, window.innerHeight - controlsHeight);
 }
+
+
+
 
 
 
@@ -94,14 +98,9 @@ function updateMouseScroll(e) {
     loop();
 }
 
-function mouseClicked() {
-    var elToSave = gph.canvas;
-    var canvasData = elToSave.toDataURL('image/png');
-    var headerData = 'data:image/png;base64,';
-    canvasData = canvasData.replace(headerData, '');
-
-    // saveToServer(canvasData, 'server_side/scroll_printer.py');
-}
+// function mouseClicked() {
+//     processCanvas();
+// }
 
 
 
@@ -116,6 +115,10 @@ var start = {
 };
 
 var startTime, endTime;
+
+document.getElementById('print-btn').addEventListener('click', (e) => {
+    processCanvas();
+}, false);
 
 document.addEventListener('touchstart', function (e) {
     // start.x = e.touches[0].clientX;
@@ -140,7 +143,7 @@ document.addEventListener('touchmove', function (e) {
 
 function updateTouchScroll(e, offset, endTime) {
     var scrollSpeed = abs(offset - start.y) / (endTime - startTime);
-    print(scrollSpeed);
+    // print(scrollSpeed);
 
     var mappedSpeed = constrain(scrollSpeed * 10, 0, cnv.width - (strweight * 13));
     scrollHistory.push(mappedSpeed);
@@ -154,21 +157,22 @@ function updateTouchScroll(e, offset, endTime) {
 }
 
 
+
 // *        ---------------------         * //
 //          BACKEND COMMUNICATION           //
 // *        ---------------------         * //
 
 // first parameter is the data to send,
 // second parameter is the script to execute.
-function saveToServer(source, targetOp) {
+function saveToServer(source, address) {
     var http = new XMLHttpRequest();
-    http.open('POST', targetOp, true);
+    http.open('POST', address, true);
 
-    // http.setRequestHeader('Content-type', 'image/png');
+    http.setRequestHeader('Content-type', 'application/json');
 
     http.onreadystatechange = function () {
         if (http.readyState == 4 && http.status == 200) {
-            print(http.response);
+            console.log(http.response);
         }
     }
 
@@ -178,6 +182,7 @@ function saveToServer(source, targetOp) {
 
     var obj = {
         "meta-data": date + '_' + time,
+        "scroll-length": ((scrolledcm * 10).toFixed(0)),
         "scroll-data": scrollHistory,
         "img-data": source
     }
@@ -186,6 +191,15 @@ function saveToServer(source, targetOp) {
     http.send(json);
 }
 
+
+function processCanvas() {
+    var elToSave = gph.canvas;
+    var canvasData = elToSave.toDataURL('image/png');
+    var headerData = 'data:image/png;base64,';
+    canvasData = canvasData.replace(headerData, '');
+    
+    saveToServer(canvasData, '/');    
+}
 
 
 function floydSteinberg(sb, w, h) // source buffer, width, height

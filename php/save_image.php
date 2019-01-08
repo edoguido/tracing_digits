@@ -13,8 +13,8 @@
     $img = $decoded->$key;
 
     // remove header data from dataURL
-    // $img = str_replace('data:image/png;base64,', '', $img);
-    // $img = str_replace(' ', '+', $img);
+    $img = str_replace('data:image/png;base64,', '', $img);
+    $img = str_replace(' ', '+', $img);
     // decode dataURL to image data
     $data = base64_decode($img);
 
@@ -27,7 +27,6 @@
 
 ?>
 
-<!-- functions -->
 <?php
     function appendJSON($filename, $event) {
         // read the file if present
