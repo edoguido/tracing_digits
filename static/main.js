@@ -1,24 +1,31 @@
-var width;
-var height;
+var width, height;
 
-// var color;
-var speed = 2;
+var speed;
 var scrollHistory = [];
 var scrolled = 0;
 var scrolledcm;
 const CONVERSION_VALUE = 0.0026458333;
 var color;
 var stroke;
-var strweight = 16;
+var strweight;
 
+// 
+// HTML Elements
 // variable to store canvas for later write on image file
 var cnv, gph;
-
 var controlsHeight = document.getElementById('scroll-data').offsetHeight;
+
+
+
+
+// *        -----------------------        * //
+// *        -----------------------        * //
+// * =======       P5 RUNTIME      ======= * //
+// *        -----------------------        * //
 
 function setup() {
     if (window.innerWidth > window.innerHeight) {
-        cnv = createCanvas(window.innerWidth / 3, window.innerHeight - controlsHeight);
+        cnv = createCanvas(window.innerWidth / 2, window.innerHeight - controlsHeight);
     } else {
         cnv = createCanvas(window.innerWidth, window.innerHeight - controlsHeight);
     }
@@ -44,22 +51,24 @@ function draw() {
     beginShape();
     noFill();
     for (var i = 0; i < scrollHistory.length; i++) {
-        color = map(scrollHistory[i], 1, cnv.width, 80, 0);
-        weight = map(scrollHistory[i], 0, cnv.width - (strweight * 10), 2, strweight);
+
+        color = map(scrollHistory[i], 1, cnv.width/1.5, 100, 0);
+        // computedWeight = map(scrollHistory[i], 0, cnv.width - (strweight * 12), 8, strweight);
 
         var x = scrollHistory[i];
-        var y = i * speed;
+        var y = i * (speed);
 
         stroke(color);
-        strokeWeight(weight);
+        strokeWeight(12);
         line(-x, y, x, y);
 
         // writing data to image buffer for later export on white background
-        gph.stroke(color);
-        gph.strokeWeight(weight);
-        // manual translation because translate function seems to be 
+        // manual translation of line because translate function seems to be 
         // in conflict with original canvas translation 
+        gph.stroke(color);
+        gph.strokeWeight(12);
         gph.line(-x + (gph.width / 2), y, x + (gph.width / 2), y);
+
     }
     endShape();
 
@@ -67,10 +76,59 @@ function draw() {
 }
 
 function windowResized() {
-    resizeCanvas(window.innerWidth, window.innerHeight - controlsHeight);
+    if (window.innerWidth > window.innerHeight) {
+        resizeCanvas(window.innerWidth / 2, window.innerHeight - controlsHeight);
+    } else {
+        resizeCanvas(window.innerWidth, window.innerHeight - controlsHeight);
+    }
 }
 
+// *        -----------------------        * //
+// * =======    END P5 RUNTIME     ======= * //
+// *        -----------------------        * //
+// *        -----------------------        * //
 
+
+
+
+
+// 
+// Print button events
+//
+var printBtn = document.getElementById('print-btn');
+var scrollText = document.getElementById('scroll-counter')
+var hasPrinted = false;
+
+printBtn.addEventListener('click', function startProcess(e) {
+
+    if (scrolledcm >= 2) {
+
+        printBtn.style.pointerEvents = 'none';
+
+        processCanvas();
+
+        if (hasPrinted == false) {
+
+            scrollText.textContent = 'Printing your trace...';
+            printBtn.style.opacity = '0.5';
+            printBtn.textContent = 'Printing';
+
+            setTimeout(() => {
+                printBtn.style.opacity = '1';
+                printBtn.textContent = 'Restart';
+                printBtn.style.pointerEvents = 'auto';
+                scrollText.textContent = 'Printing done!';
+            }, 4000);
+            hasPrinted = true;
+
+        } else if (hasPrinted == true) {
+            location.reload();
+        }
+    } else {
+        scrollText.textContent = 'Scroll some more!';
+    }
+
+}, false);
 
 
 
@@ -84,23 +142,24 @@ function mouseWheel(e) {
 }
 
 function updateMouseScroll(e) {
+    speed = 2;
+    strweight = 16;
     var scrollSpeed, mappedSpeed;
 
     scrollSpeed = abs(e.delta);
-    mappedSpeed = constrain(scrollSpeed, 0, cnv.width - (strweight * 13));
+    mappedSpeed = parseFloat(constrain(scrollSpeed, 0, cnv.width - (strweight * 6)).toFixed(1));
     scrollHistory.push(mappedSpeed);
 
     scrolled += 1;
-    scrolledcm = scrolled * CONVERSION_VALUE;
+    scrolledcm = (scrolled * CONVERSION_VALUE * 10).toFixed(0);
 
-    document.getElementById('scroll-counter').innerHTML = `You have scrolled ${(scrolledcm * 10).toFixed(0)} centimeters.`
+    document.getElementById('scroll-counter').innerHTML = `You have scrolled ${scrolledcm} centimeters.`
 
     loop();
 }
 
-// function mouseClicked() {
-//     processCanvas();
-// }
+// *        -----------------------         * //
+
 
 
 
@@ -113,48 +172,79 @@ var start = {
     x: 0,
     y: 0
 };
-
+var offset = {
+    x: 0,
+    y: 0
+}
 var startTime, endTime;
 
-document.getElementById('print-btn').addEventListener('click', (e) => {
-    processCanvas();
-}, false);
 
-document.addEventListener('touchstart', function (e) {
-    // start.x = e.touches[0].clientX;
+// *    -----------------     * //
+//       TOUCH LISTENERS        //
+
+document.addEventListener('touchstart', (e) => {
     start.y = e.touches[0].clientY;
     startTime = new Date().getTime();
-    // print(startTime);
 }, false);
 
-document.addEventListener('touchend', function (e) {
+document.addEventListener('touchend', () => {
     endTime = new Date().getTime();
-    // print(endTime);
 }, false);
 
-document.addEventListener('touchmove', function (e) {
-    offset = {};
-    // offset.x = start.x - e.touches[0].clientX;
+// preventBouncing prevents mobile browsers overscroll
+// Event Listener operations are delegated to preventBouncing function
+document.addEventListener('touchmove', preventBouncing, { passive: false });
+
+function preventBouncing(e) {
+
     endTime = new Date().getTime();
     offset.y = start.y - e.touches[0].clientY;
+    touchSpeed(100, e.touches[0].clientY)
 
-    updateTouchScroll(e, offset.y, endTime);
-}, false);
+    //preventing the easing on iOS devices
+    e.preventDefault();
 
-function updateTouchScroll(e, offset, endTime) {
-    var scrollSpeed = abs(offset - start.y) / (endTime - startTime);
-    // print(scrollSpeed);
+}
 
-    var mappedSpeed = constrain(scrollSpeed * 10, 0, cnv.width - (strweight * 13));
+// var myImpetus = new Impetus({
+//     source: document,
+//     friction: 0.95,
+//     boundY: [0, 1],
+//     bounce: true,
+//     update: function(y) {
+//     }
+// })
+
+// *    -----------------     * //
+
+function updateTouchScroll(scrollSpeed) {
+    speed = 6;
+    strweight = 21;
+    
+    // var scrollSpeed = Math.abs( (offset - start.y) ) / (endTime - startTime);
+    var mappedSpeed = parseFloat(constrain(scrollSpeed * 10, 0, cnv.width - (strweight * 4)).toFixed(1));
     scrollHistory.push(mappedSpeed);
 
-    scrolled += 1;
-    scrolledcm = scrolled * CONVERSION_VALUE;
+    scrolled += 2;
+    scrolledcm = (scrolled * CONVERSION_VALUE * 10).toFixed(0);
 
-    document.getElementById('scroll-counter').innerHTML = `You have scrolled ${(scrolledcm * 10).toFixed(0)} centimeters.`
+    document.getElementById('scroll-counter').innerHTML = `You have scrolled ${scrolledcm} centimeters.`
 
     loop();
 }
+
+function touchSpeed(interval, thisY) {
+        window.setTimeout( () => {
+            var distance = Math.abs(thisY - start.y);
+            var scrollSpeed = distance / interval;
+            scrollSpeed = scrollSpeed * 25;
+            start.y = thisY;
+            updateTouchScroll(scrollSpeed);
+        }, interval);
+}
+
+// *        -----------------------         * //
+
 
 
 
@@ -182,7 +272,7 @@ function saveToServer(source, address) {
 
     var obj = {
         "meta-data": date + '_' + time,
-        "scroll-length": ((scrolledcm * 10).toFixed(0)),
+        "scroll-length": scrolledcm,
         "scroll-data": scrollHistory,
         "img-data": source
     }
@@ -197,8 +287,8 @@ function processCanvas() {
     var canvasData = elToSave.toDataURL('image/png');
     var headerData = 'data:image/png;base64,';
     canvasData = canvasData.replace(headerData, '');
-    
-    saveToServer(canvasData, '/');    
+
+    saveToServer(canvasData, '/');
 }
 
 

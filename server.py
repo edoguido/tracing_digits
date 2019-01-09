@@ -1,6 +1,10 @@
 import json
 from flask import Flask, render_template, url_for, request
-import scroll_printer
+
+try:
+    import scroll_printer
+except Exception:
+    print 'Device not active!\n'
 
 app = Flask(__name__)
 
@@ -15,14 +19,15 @@ def index():
 
         date = data['meta-data']
         scroll_length = data['scroll-length']
-        # scroll_data = data['scroll-data']
         img_data = data['img-data']
+        # scroll_data is unused so far
+        # scroll_data = data['scroll-data']
 
-        output = json.dumps(data, sort_keys=True)
+        output = json.dumps(data, indent=4, sort_keys=True)
         with open("sessions/sessions.json", "wb") as fo:
             fo.write(output)
 
-        scroll_printer.printResult(scroll_length, img_data, date)
+        # scroll_printer.printResult(scroll_length, img_data, date)
 
         return 'worked!'
 
