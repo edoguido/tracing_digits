@@ -46,27 +46,26 @@ function draw() {
         scrollHistory.splice(0, 1);
     }
 
-    translate(width / 2, 0);
-
     beginShape();
     noFill();
     for (var i = 0; i < scrollHistory.length; i++) {
 
-        color = map(scrollHistory[i], 1, cnv.width/1.5, 100, 0);
         // computedWeight = map(scrollHistory[i], 0, cnv.width - (strweight * 12), 8, strweight);
-
+        
         var x = scrollHistory[i];
         var y = i * (speed);
-
+        
+        color = map(scrollHistory[i], 1, cnv.width/1.5, 110, 10);
         stroke(color);
-        strokeWeight(12);
-        line(-x, y, x, y);
-
+        strokeWeight(4);
+        line(-x + (cnv.width / 2), y, x + (cnv.width / 2), y);
+        
         // writing data to image buffer for later export on white background
         // manual translation of line because translate function seems to be 
         // in conflict with original canvas translation 
-        gph.stroke(color);
-        gph.strokeWeight(12);
+        gph_color = map(scrollHistory[i], 1, cnv.width/1.5, 120, 30);
+        gph.stroke(gph_color);
+        gph.strokeWeight(4);
         gph.line(-x + (gph.width / 2), y, x + (gph.width / 2), y);
 
     }
@@ -96,29 +95,21 @@ function windowResized() {
 // Print button events
 //
 var printBtn = document.getElementById('print-btn');
-var scrollText = document.getElementById('scroll-counter')
+var scrollText = document.getElementById('scroll-counter');
 var hasPrinted = false;
 
-printBtn.addEventListener('click', function startProcess(e) {
+printBtn.addEventListener('click', function startProcess() {
 
     if (scrolledcm >= 2) {
 
         printBtn.style.pointerEvents = 'none';
 
-        processCanvas();
-
         if (hasPrinted == false) {
+            processCanvas();
 
             scrollText.textContent = 'Printing your trace...';
             printBtn.style.opacity = '0.5';
             printBtn.textContent = 'Printing';
-
-            setTimeout(() => {
-                printBtn.style.opacity = '1';
-                printBtn.textContent = 'Restart';
-                printBtn.style.pointerEvents = 'auto';
-                scrollText.textContent = 'Printing done!';
-            }, 4000);
             hasPrinted = true;
 
         } else if (hasPrinted == true) {
@@ -262,7 +253,7 @@ function saveToServer(source, address) {
 
     http.onreadystatechange = function () {
         if (http.readyState == 4 && http.status == 200) {
-            console.log(http.response);
+            printResponse(http.response);
         }
     }
 
@@ -281,6 +272,17 @@ function saveToServer(source, address) {
     http.send(json);
 }
 
+function printResponse(response) {
+    printBtn.style.opacity = '1';
+    printBtn.textContent = 'Restart';
+    printBtn.style.pointerEvents = 'auto';
+
+    scrollText.textContent = response;
+
+    if (response == 'Paper is missing :\(') {
+        printBtn.textContent = 'That\'s bad!';
+    }
+}
 
 function processCanvas() {
     var elToSave = gph.canvas;

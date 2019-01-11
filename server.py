@@ -1,35 +1,53 @@
-import json
-from flask import Flask, render_template, url_for, request
+import requests
+from flask import Flask, render_template, request
 
+from file_ops import recordSession
 try:
     import scroll_printer
-except Exception:
-    print 'Device not active!\n'
+except Exception as e:
+    e_message = '** Device not active! **'
 
-app = Flask(__name__)
+    print '\n', e_message
+    print e, '\n'
 
-@app.route('/', methods=['GET', 'POST'])
-def index():
+    # extra = {}
+    # extra['value1'] = e_message
+    # extra['value2'] = e
+    # requests.post('https://maker.ifttt.com/trigger/digital_traces/with/key/dbGvvRtbul5OU_NDdAHz26', data=extra)
+
+
+APP = Flask(__name__)
+
+
+@APP.route('/', methods=['GET', 'POST'])
+def serve_trace():
 
     if request.method == 'GET':
         return render_template('index.html')
 
     elif request.method == 'POST':
+
         data = request.get_json()
+        recordSession(data)
 
-        date = data['meta-data']
-        scroll_length = data['scroll-length']
-        img_data = data['img-data']
-        # scroll_data is unused so far
-        # scroll_data = data['scroll-data']
+        try:
+            result = scroll_printer.printResult(data)
+        except Exception as e:
+            error_message = '** Could not print! **'
 
-        output = json.dumps(data, indent=4, sort_keys=True)
-        with open("sessions/sessions.json", "wb") as fo:
-            fo.write(output)
+            print '\n', error_message
+            print e, '\n'
 
-        # scroll_printer.printResult(scroll_length, img_data, date)
+            extra = {}
+            extra['value1'] = error_message
+            extra['value2'] = e
+            requests.post(
+                'https://maker.ifttt.com/trigger/digital_traces/with/key/dbGvvRtbul5OU_NDdAHz26', data=extra)
 
-        return 'worked!'
+            return 'Could not print! :('
+
+        return result[0]['message']
+
 
 if __name__ == '__main__':
-    app.run(debug=True, host='0.0.0.0', port='5000')
+    APP.run(debug=False, host='0.0.0.0', port='5000')

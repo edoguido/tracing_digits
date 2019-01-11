@@ -11,9 +11,12 @@ chardet==3.0.4
 Click==7.0
 cryptography==2.4.2
 Django==2.1.4
+escpos==1.5
 Flask==1.0.2
+future==0.17.1
 idna==2.7
 image==1.5.27
+iso8601==0.1.12
 isort==4.3.4
 itsdangerous==1.1.0
 Jinja2==2.10
@@ -39,7 +42,8 @@ pytz==2018.7
 pyusb==1.0.2
 PyYAML==3.13
 qrcode==6.0
-requests==2.20.1
+requests==2.21.0
+serial==0.0.87
 six==1.11.0
 update-checker==0.16
 urllib3==1.24.1
