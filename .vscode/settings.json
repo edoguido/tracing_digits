@@ -3,5 +3,5 @@
     "python.venvPath": "/Users/edoardo/Library/Mobile Documents/com~apple~CloudDocs/Git/tracing_digits/trdi_python",
     "python.linting.pylintEnabled": false,
     "python.linting.banditEnabled": true,
-    "python.linting.enabled": true
+    "python.linting.enabled": true,
 }

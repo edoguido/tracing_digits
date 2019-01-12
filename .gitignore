@@ -16,3 +16,5 @@ pyvenv.cfg
 pip-selfcheck.json
 *.1
 *.pyc
+trdi.code-workspace
+.vscode/settings.json
