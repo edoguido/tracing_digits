@@ -1,3 +1,9 @@
+'''
+
+tracing_digits Flask server
+
+'''
+
 import requests
 from flask import Flask, render_template, request
 
@@ -7,13 +13,13 @@ try:
 except Exception as e:
     e_message = '** Device not active! **'
 
-    print '\n', e_message
-    print e, '\n'
+    print ('\n', e_message)
+    print (e, '\n')
 
-    # extra = {}
-    # extra['value1'] = e_message
-    # extra['value2'] = e
-    # requests.post('https://maker.ifttt.com/trigger/digital_traces/with/key/dbGvvRtbul5OU_NDdAHz26', data=extra)
+    extra = {}
+    extra['value1'] = e_message
+    extra['value2'] = e
+    requests.post('https://maker.ifttt.com/trigger/digital_traces/with/key/dbGvvRtbul5OU_NDdAHz26', data=extra)
 
 
 APP = Flask(__name__)
@@ -35,19 +41,18 @@ def serve_trace():
         except Exception as e:
             error_message = '** Could not print! **'
 
-            print '\n', error_message
-            print e, '\n'
+            print ('\n', error_message)
+            print (e, '\n')
 
             extra = {}
             extra['value1'] = error_message
             extra['value2'] = e
-            requests.post(
-                'https://maker.ifttt.com/trigger/digital_traces/with/key/dbGvvRtbul5OU_NDdAHz26', data=extra)
+            requests.post('https://maker.ifttt.com/trigger/digital_traces/with/key/dbGvvRtbul5OU_NDdAHz26', data=extra)
 
             return 'Could not print! :('
 
-        return result[0]['message']
+        return result
 
 
 if __name__ == '__main__':
-    APP.run(debug=False, host='0.0.0.0', port='5000')
+    APP.run(debug=True, host='0.0.0.0', port='5000')

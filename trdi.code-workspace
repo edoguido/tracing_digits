@@ -2,10 +2,6 @@
 	"folders": [
 		{
 			"path": "."
-		},
-		{
-			"uri": "ssh://tracing_digits/",
-			"name": "SSH FS - tracing_digits"
 		}
 	],
 	"settings": {}

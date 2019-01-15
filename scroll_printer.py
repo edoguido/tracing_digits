@@ -1,46 +1,40 @@
 '''
 
-# granting USB access to current user 
-usermod -m -a -G plugdev,users name_of_user
-
-# setup udev rule to grant USB access for non-root users
-sudo nano /etc/udev/rules.d/99-com.rules
-|
-|- paste in the following code:
-   SUBSYSTEMS=="usb", ENV{DEVTYPE}=="usb_device", ATTRS{idVendor}=="0456", ATTRS{idProduct}=="0808", GROUP="plugdev", MODE="0777"
-
-## restart udev service
-sudo udevadm control --reload
-sudo udevadm trigger
-
 # on Raspberry Pi:
 sudo apt-get install python-pip
-pip install virtualenv
-sudo /usr/bin/easy_install virtualenv
-virtualenv -p /usr/bin/python2.7 ~/path/to/virtualenv_folder
-
-# activate virtual environment
-source ~/path/to/virtualenv_folder
+pip3 install virtualenv
+virtualenv -p /usr/bin/python3 ~/path/to/virtualenv_folder
 
 ## check if python and pip are in virtual environment
 which python
-which pip
+which pip3
 
 # for installing cryptography on rPi
 sudo apt-get install build-essential libssl-dev libffi-dev python-dev
-pip install cryptography
+pip3 install cryptography
 
 # support for jpeg and other image libraries before Pillow install
 sudo apt-get install libtiff-dev libjpeg-dev zlib1g-dev libfreetype6-dev liblcms2-dev libwebp-dev tcl-dev tk-dev python-tk
 
 # install libraries and dependencies
-pip install python-escpos Pillow requests libusb qrcode pyusb serial pyserial paramiko Flask
+pip3 install python-escpos Pillow requests libusb qrcode pyusb serial pyserial Flask
+
+## setup udev rule to grant USB access for non-root users
+sudo nano /etc/udev/rules.d/99-com.rules
+|
+|- paste in the following code:
+   SUBSYSTEM=="usb", ATTR{idVendor}=="0fcf", ATTR{idProduct}=="1008", MODE="666"
+
+## restart udev service
+sudo udevadm control --reload
+sudo udevadm trigger
 
 # bEndpointAddress     0x81  EP 1 IN
 # bEndpointAddress     0x03  EP 3 OUT
 
 '''
 
+import sys
 import time
 import datetime
 import requests
@@ -99,20 +93,23 @@ def printResult(data):
             "result_positive": True
         })
 
-        return print_result
+        return print_result[0]['message']
 
     except Exception as e:
         extra = {}
-        e_message = '** Paper is missing! **'
+        e_message = '** Something went wrong during print! **'
+        reset_cmd = b'\x1b?\n\x00'
 
-        print '\n', e_message
-        print e, '\n'
+        p._raw(reset_cmd)
+
+        print ('\n', e_message)
+        print (e, '\n')
 
         extra['value1'] = e_message
         extra['value2'] = e
         extra['value3'] = date
-        requests.post(
-            'https://maker.ifttt.com/trigger/digital_traces/with/key/dbGvvRtbul5OU_NDdAHz26', data=extra)
+        requests.post('https://maker.ifttt.com/trigger/digital_traces/with/key/dbGvvRtbul5OU_NDdAHz26', data=extra)
+
 
         print_result.append({
             "message": "Paper is missing :(",
@@ -123,7 +120,11 @@ def printResult(data):
 
 
 def decode_img_data(img_data):
-    decoded = img_data.decode('base64')
+    if sys.version_info >= (3, 0):
+        import base64
+        decoded = base64.b64decode(img_data)
+    else:
+        decoded = img_data.decode('base64')
     return decoded
 
 

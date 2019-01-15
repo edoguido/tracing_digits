@@ -18,3 +18,7 @@ pip-selfcheck.json
 *.pyc
 trdi.code-workspace
 .vscode/settings.json
+reset_sessions.sh
+get_trdi_data.sh
+test.png
+trdi_python_requirements.txt
