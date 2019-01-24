@@ -130,7 +130,7 @@ def decode_img_data(img_data):
 
 def save_image(img_data, date):
     folder = datetime.datetime.today().strftime('%Y-%m-%d')
-    filename = "sessions/" + folder + "/" + date + ".png"
+    filename = "/home/drivinward/trdi/sessions/" + folder + "/" + date + ".png"
     decoded = decode_img_data(img_data)
 
     with open(filename, "wb") as fh:
