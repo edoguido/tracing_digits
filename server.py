@@ -19,7 +19,7 @@ except Exception as e:
     extra = {}
     extra['value1'] = e_message
     extra['value2'] = e
-    requests.post('https://maker.ifttt.com/trigger/digital_traces/with/key/dbGvvRtbul5OU_NDdAHz26', data=extra)
+    # requests.post('https://maker.ifttt.com/trigger/digital_traces/with/key/dbGvvRtbul5OU_NDdAHz26', data=extra)
 
 
 APP = Flask(__name__)
@@ -47,7 +47,7 @@ def serve_trace():
             extra = {}
             extra['value1'] = error_message
             extra['value2'] = e
-            requests.post('https://maker.ifttt.com/trigger/digital_traces/with/key/dbGvvRtbul5OU_NDdAHz26', data=extra)
+            # requests.post('https://maker.ifttt.com/trigger/digital_traces/with/key/dbGvvRtbul5OU_NDdAHz26', data=extra)
 
             return 'Could not print! :('
 

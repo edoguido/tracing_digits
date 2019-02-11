@@ -108,7 +108,7 @@ def printResult(data):
         extra['value1'] = e_message
         extra['value2'] = e
         extra['value3'] = date
-        requests.post('https://maker.ifttt.com/trigger/digital_traces/with/key/dbGvvRtbul5OU_NDdAHz26', data=extra)
+        # requests.post('https://maker.ifttt.com/trigger/digital_traces/with/key/dbGvvRtbul5OU_NDdAHz26', data=extra)
 
 
         print_result.append({

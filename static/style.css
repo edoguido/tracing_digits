@@ -5,11 +5,17 @@
 html,
 body {
     overflow: hidden;
+
     height: 100%;
     width: 100%;
     padding: 0;
     margin: 0;
-    background-color: rgb(120, 120, 120);
+
+    background-color: rgb(180, 180, 180) !important;
+
+    font-family: 'IBM Plex Mono';
+    font-size: 1em;
+    color: black;
 }
 
 canvas {
@@ -25,20 +31,49 @@ canvas#defaultCanvas0.p5canvas {
     z-index: 1;
 }
 
-#scroll-data,
-#scroll-counter {
-    color: black;
-    font-family: 'IBM Plex Mono';
-    font-size: 12pt;
+#intro {
+    position: absolute;
+    width: calc(100% - var(--padding) * 2);
+    height: calc(100% - var(--padding) * 2);
+    background-color: rgb(180, 180, 180);
+
+    display: grid;
+    align-content: space-around;
+    grid-template-rows: 8fr 1fr;
+    padding: var(--padding);
+
+    z-index: 100;
+    transition: opacity 1s cubic-bezier(0.445, 0.05, 0.55, 0.95);
+}
+#intro.hidden {
+    opacity: 0;
+}
+
+#intro > * {
+    align-self: center;
+}
+
+#intro > #intro-text > p:first-child {
+    font-size: 1.5em;
+    margin-bottom: calc(var(--padding) * 3);
+}
+
+#intro p {
+    text-align: left;
 }
 
 #scroll-data {
     width: 100%;
 
-    display: flex;
+    /* display: flex;
     flex-direction: column;
     justify-content: center;
-    align-items: stretch;
+    align-items: stretch; */
+
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    align-content: center;
+    justify-content: center;
 
     position: absolute;
     bottom: 0;
@@ -48,30 +83,28 @@ canvas#defaultCanvas0.p5canvas {
     text-align: center;
     display: block;
     margin: var(--padding);
+    align-self: center;
 }
 
-div#print-btn {
-    display: inline;
-    margin: var(--padding) auto calc(var(--padding) * 2) auto;
+.btn {
+    display: block;
+    margin: var(--padding) auto;
     padding: var(--padding) calc(var(--padding) * 2);
 
+    text-align: center;
     background-color: transparent;
     border: 1px solid rgba(0, 0, 0, 1);
-
-    font-size: 10pt;
-    font-family: 'IBM Plex Mono';
-    color: black;
 
     cursor: pointer;
 }
 
-#scroll-data>div:hover {
+.btn:hover {
     background-color: rgba(0, 0, 0, 0.1);
     border: 1px solid rgba(0, 0, 0, 1);
     color: rgba(0, 0, 0, 1);
 }
 
-#scroll-data>div:active {
+.btn:active {
     background-color: rgba(0, 0, 0, 0.2);
     border: 1px solid rgba(0, 0, 0, 1);
     color: rgba(0, 0, 0, 1);
