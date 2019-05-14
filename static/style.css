@@ -43,10 +43,11 @@ canvas#defaultCanvas0.p5canvas {
     padding: var(--padding);
 
     z-index: 100;
-    transition: opacity 1s cubic-bezier(0.445, 0.05, 0.55, 0.95);
+    transition: opacity .25s cubic-bezier(0.445, 0.05, 0.55, 0.95);
 }
 #intro.hidden {
     opacity: 0;
+    pointer-events: none;
 }
 
 #intro > * {
@@ -71,7 +72,7 @@ canvas#defaultCanvas0.p5canvas {
     align-items: stretch; */
 
     display: grid;
-    grid-template-columns: 2fr 1fr;
+    grid-template-columns: 1.5fr 1fr;
     align-content: center;
     justify-content: center;
 

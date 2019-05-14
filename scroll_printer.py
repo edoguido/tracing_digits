@@ -82,9 +82,11 @@ def printResult(data):
         p.text('the average user scrolls\n')
 
         p.set(align='CENTER', font='b', width=2, height=2, density=1)
-        p.text('90 meters each day.\n')
+        p.text('90 meters each day.\n\n')
+        p.text('An infopoetry by.\n')
+        p.text('Edoardo Guido.\n')
 
-        p.cut(mode='PART')
+        p.cut()
 
         time.sleep(2)
 

@@ -16,6 +16,11 @@ var cnv, gph;
 var controlsHeight = document.getElementById('scroll-data').offsetHeight;
 
 
+// intro events
+
+document.querySelector("#intro > .btn").addEventListener("click", function() {
+    this.parentElement.classList.add("hidden");
+},false)
 
 
 // *        -----------------------        * //
@@ -51,19 +56,19 @@ function draw() {
     for (var i = 0; i < scrollHistory.length; i++) {
 
         // computedWeight = map(scrollHistory[i], 0, cnv.width - (strweight * 12), 8, strweight);
-
+        
         var x = scrollHistory[i];
         var y = i * (speed);
-
-        color = map(scrollHistory[i], 1, cnv.width / 1.5, 110, 10);
+        
+        color = map(scrollHistory[i], 1, cnv.width/1.5, 110, 10);
         stroke(color);
         strokeWeight(4);
         line(-x + (cnv.width / 2), y, x + (cnv.width / 2), y);
-
+        
         // writing data to image buffer for later export on white background
         // manual translation of line because translate function seems to be 
         // in conflict with original canvas translation 
-        gph_color = map(scrollHistory[i], 1, cnv.width / 1.5, 120, 30);
+        gph_color = map(scrollHistory[i], 1, cnv.width/1.5, 120, 30);
         gph.stroke(gph_color);
         gph.strokeWeight(4);
         gph.line(-x + (gph.width / 2), y, x + (gph.width / 2), y);
@@ -184,15 +189,13 @@ document.addEventListener('touchend', () => {
 
 // preventBouncing prevents mobile browsers overscroll
 // Event Listener operations are delegated to preventBouncing function
-document.addEventListener('touchmove', preventBouncing, {
-    passive: false
-});
+document.addEventListener('touchmove', preventBouncing, { passive: false });
 
 function preventBouncing(e) {
 
     endTime = new Date().getTime();
     offset.y = start.y - e.touches[0].clientY;
-    touchSpeed(100, e.touches[0].clientY);
+    touchSpeed(100, e.touches[0].clientY)
 
     //preventing the easing on iOS devices
     e.preventDefault();
@@ -213,7 +216,7 @@ function preventBouncing(e) {
 function updateTouchScroll(scrollSpeed) {
     speed = 6;
     strweight = 21;
-
+    
     // var scrollSpeed = Math.abs( (offset - start.y) ) / (endTime - startTime);
     var mappedSpeed = parseFloat(constrain(scrollSpeed * 10, 0, cnv.width - (strweight * 4)).toFixed(1));
     scrollHistory.push(mappedSpeed);
@@ -227,13 +230,13 @@ function updateTouchScroll(scrollSpeed) {
 }
 
 function touchSpeed(interval, thisY) {
-    window.setTimeout(() => {
-        var distance = Math.abs(thisY - start.y);
-        var scrollSpeed = distance / interval;
-        scrollSpeed = scrollSpeed * 25;
-        start.y = thisY;
-        updateTouchScroll(scrollSpeed);
-    }, interval);
+        window.setTimeout( () => {
+            var distance = Math.abs(thisY - start.y);
+            var scrollSpeed = distance / interval;
+            scrollSpeed = scrollSpeed * 25;
+            start.y = thisY;
+            updateTouchScroll(scrollSpeed);
+        }, interval);
 }
 
 // *        -----------------------         * //
@@ -296,19 +299,19 @@ function processCanvas() {
 }
 
 
-// function floydSteinberg(sb, w, h) // source buffer, width, height
-// {
-//     for (var i = 0; i < h; i++)
-//         for (var j = 0; j < w; j++) {
-//             var ci = i * w + j; // current buffer index
-//             var cc = sb[ci]; // current color
-//             var rc = (cc < 128 ? 0 : 255); // real (rounded) color
-//             var err = cc - rc; // error amount
-//             sb[ci] = rc; // saving real color
-//             if (j + 1 < w) sb[ci + 1] += (err * 7) >> 4; // if right neighbour exists
-//             if (i + 1 == h) continue; // if we are in the last line
-//             if (j > 0) sb[ci + w - 1] += (err * 3) >> 4; // bottom left neighbour
-//             sb[ci + w] += (err * 5) >> 4; // bottom neighbour
-//             if (j + 1 < w) sb[ci + w + 1] += (err * 1) >> 4; // bottom right neighbour
-//         }
-// }
+function floydSteinberg(sb, w, h) // source buffer, width, height
+{
+    for (var i = 0; i < h; i++)
+        for (var j = 0; j < w; j++) {
+            var ci = i * w + j; // current buffer index
+            var cc = sb[ci]; // current color
+            var rc = (cc < 128 ? 0 : 255); // real (rounded) color
+            var err = cc - rc; // error amount
+            sb[ci] = rc; // saving real color
+            if (j + 1 < w) sb[ci + 1] += (err * 7) >> 4; // if right neighbour exists
+            if (i + 1 == h) continue; // if we are in the last line
+            if (j > 0) sb[ci + w - 1] += (err * 3) >> 4; // bottom left neighbour
+            sb[ci + w] += (err * 5) >> 4; // bottom neighbour
+            if (j + 1 < w) sb[ci + w + 1] += (err * 1) >> 4; // bottom right neighbour
+        }
+}
