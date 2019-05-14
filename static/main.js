@@ -138,7 +138,7 @@ function mouseWheel(e) {
 }
 
 function updateMouseScroll(e) {
-    speed = 2;
+    speed = 6;
     strweight = 16;
     var scrollSpeed, mappedSpeed;
 
